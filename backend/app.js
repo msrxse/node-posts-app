@@ -1,13 +1,17 @@
 const express = require("express");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
+const { MONGO_USER, MONGO_PASSWORD, MONGO_IP, MONO_PORT } = require("./config/config");
 
 // express app
 const app = express();
-
+const mongoURL = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONO_PORT}/?authSource=admin`;
 // connect DB
 // ip-address = name-of-container (you can refer to the IP with the name of the container)
-mongoose.connect("mongodb://root:mypassword@mongo:27017/?authSource=admin");
+mongoose
+  .connect(mongoURL)
+  .then(() => console.log("successfully connected to DB"))
+  .catch((err) => console.log(err));
 
 // register view engine
 app.set("view engine", "ejs");
@@ -23,7 +27,7 @@ app.use(morgan("dev"));
 app.get("/", (req, res) => {
   const blogs = [
     {
-      title: "Yoshi finds eggs",
+      title: "Yoshi finds eggs!!!",
       snippet: "Lorem ipsum dolor sit amet consectetur",
     },
     {
