@@ -8,10 +8,21 @@ const app = express();
 const mongoURL = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONO_PORT}/?authSource=admin`;
 // connect DB
 // ip-address = name-of-container (you can refer to the IP with the name of the container)
-mongoose
+
+// Mongoose tries every 30 seconds but anyway we retry if failed (not best practice!)
+// Dont rely on Docker to ensure DB is up!
+const connectWithRetry = () => {
+  mongoose
   .connect(mongoURL)
   .then(() => console.log("successfully connected to DB"))
-  .catch((err) => console.log(err));
+  .catch((err) => {
+    console.log(err);
+    // will wait 5 secs before trying again
+    setTimeout(connectWithRetry, 5000)
+  });
+}
+
+connectWithRetry();
 
 // register view engine
 app.set("view engine", "ejs");

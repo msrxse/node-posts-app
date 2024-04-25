@@ -1,7 +1,12 @@
      
 # Nodejs and Express example with MongoDB
 
+
 ## Run the System
+```bash
+cd backend && docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+```
+or without docker:
 
 ```bash
 cd backend && node app.js
