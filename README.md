@@ -13,11 +13,16 @@ The docker commands translates to the given docker file:
 
 ```bash
 docker compose up -d --build  // where -d is detached mode
-docker compose down -v // where -v removes associated volmnes
+// Allowing dev file to override default dockerfile
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build  // where -d is detached mode
+docker compose down -v // where -v removes associated volumes
 ```
 - This command does build image and run container
 - name convention for image name: `foldername_name-of-service`
 - `--build` flag // because only looks for image name so changes to dockerfile and or package wont rebuild image  k
+- `-f` flag allows dev/prod (last) file to override default (initial) dockerfile
+- dev file allows hot-reloading but prod doesnt (will need `--build` flag is you need to merge any changes)
+
 
 
 # Working with docker commands

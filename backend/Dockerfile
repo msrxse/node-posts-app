@@ -8,8 +8,17 @@ WORKDIR /app
 # Helps cache build step unless this package.json changes (instead of any change anywhere)
 COPY package.json .
 
-# Builds the app in container
-RUN npm install
+# THis argument needs to be passed in to be used bellow
+# You must set this value in the docker-compose file
+# (It gets passed to Dockerfile when is building the docker image)
+ARG NODE_ENV
+
+# Builds the app in container (dev versus prod)
+# if brackets must have space on either side!!!
+RUN if [ "$NODE_ENV" = "development" ]; \
+  then npm install; \
+  else npm install --only=production;\
+  fi
 
 # Copies all in current directory
 COPY . ./
@@ -21,4 +30,4 @@ ENV PORT=3000
 EXPOSE ${PORT}
 
 # command to run on container
-CMD [ "npm", "run", "dev" ]
+CMD [ "node", "app.js"]

@@ -1,0 +1,12 @@
+version: '3'
+services:
+  node-app:
+    build:
+      context: .
+      # this variables are used in Dockerfile so we need to
+      #  pass then so these are available when builting image
+      args: 
+        NODE_ENV: production
+    environment:
+      - NODE_ENV=production
+    command: node app.js
