@@ -5,6 +5,10 @@ const mongoose = require("mongoose");
 // express app
 const app = express();
 
+// connect DB
+// ip-address = name-of-container (you can refer to the IP with the name of the container)
+mongoose.connect("mongodb://root:mypassword@mongo:27017/?authSource=admin");
+
 // register view engine
 app.set("view engine", "ejs");
 

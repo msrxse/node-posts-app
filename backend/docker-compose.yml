@@ -8,3 +8,13 @@ services:
       - PORT=3000
     # env_file:
     #   - ./.env
+  mongo:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=mypassword
+    volumes:
+      # Allows us to persist data here 
+      - mongo-db:/data/db
+volumes:
+  mongo-db:

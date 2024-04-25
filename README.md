@@ -15,7 +15,7 @@ The docker commands translates to the given docker file:
 docker compose up -d --build  // where -d is detached mode
 // Allowing dev file to override default dockerfile
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build  // where -d is detached mode
-docker compose down -v // where -v removes associated volumes
+docker compose down -v // where -v removes associated volumes (dont use -v if you using a db volume)
 ```
 - This command does build image and run container
 - name convention for image name: `foldername_name-of-service`
@@ -93,10 +93,7 @@ exit // to
 
 - Bind mount in docker command:
 
-```bash
-docker run -v $(pwd):/app    // then rest of params
-
-// where 'path-to-folder-in-local-machine' : 'path-to-folder-in-container'
+docker exec -it backend-mongo-1 bashwhere 'path-to-folder-in-local-machine' : 'path-to-folder-in-container'
 
 ```
 - We need a anonimous-volume so we can unsync out local node_modules 
@@ -123,4 +120,53 @@ write then out in an .env file. (pass the --env-file flag to docker command)
 
 ```bash
 docker run  --env-file= ./.env (or just use .env file)   ....rest of flags
+```
+
+## Login into mongo DB instance
+
+```bash
+docker exec -it backend-mongo-1 mongosh -u root -p mypassword
+
+```
+```
+  test> db // shows all dbs
+  test
+  test> use mydb // create new db
+  switched to db mydb
+  mydb> show dbs // doesnt show db since there is nothing in it
+  admin   100.00 KiB
+  config   12.00 KiB
+  local    72.00 KiB
+  mydb> db.books.insert({"name": "harry potter"}) // inserting record on it
+  mydb> db.books.find()
+  [ { _id: ObjectId('662a61a6ddd232fdb43b9274'), name: 'harry potter' } ]
+  mydb> show dbs // now shows db
+  admin   100.00 KiB
+  config   12.00 KiB
+  local    72.00 KiB
+  mydb     40.00 KiB
+  mydb> exit
+
+```
+
+- Note that tearing the container down with -v flag will also remove the volume - all the db data will disappear.
+- We use a volume to persist data, 
+- When tearing down dont use the `-v flag`
+
+## Finding out the ip adress of mongo_db container
+
+```bash
+docker ps // to get container name
+docker inspect backend-node-app-1 
+```
+- But instead of the commands above you can use the name of the service instead
+docker already sets it up for you. So use ip-address=name-of-mongo-service when connecting to mongoose.
+
+- To know if mongoose has connected correctly you can ping it
+ - See (https://www.mongodb.com/docs/manual/reference/command/ping/)
+
+```bash
+ docker exec -it backend-mongo-1 mongosh
+db.runCommand({ ping: 1 })
+{ ok: 1 } // should respond
 ```
