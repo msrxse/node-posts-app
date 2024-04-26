@@ -61,7 +61,7 @@ app.use(
       saveUninitialized: false,
       secure: false,
       httpOnly: true,
-      maxAge: 6000000, // this is in msec
+      maxAge: 60000, // just 1 min for testing purposes
     },
   })
 );
