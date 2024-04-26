@@ -1,12 +1,13 @@
-     
 # Nodejs and Express example with MongoDB
 
 Blog/posts application demo CRUD with node backend
 
 ## Run the System
+
 ```bash
 cd backend && docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
 ```
+
 or without docker:
 
 ```bash
@@ -23,13 +24,12 @@ docker compose up -d --build  # where -d is detached mode
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build  # where -d is detached mode
 docker compose down -v # where -v removes associated volumes (dont use -v if you using a db volume)
 ```
+
 - This command does build image and run container
 - name convention for image name: `foldername_name-of-service`
-- `--build` flag // because only looks for image name so changes to dockerfile and or package wont rebuild image  k
+- `--build` flag // because only looks for image name so changes to dockerfile and or package wont rebuild image k
 - `-f` flag allows dev/prod (last) file to override default (initial) dockerfile
 - dev file allows hot-reloading but prod doesnt (will need `--build` flag is you need to merge any changes)
-
-
 
 # Working with docker commands
 
@@ -44,14 +44,15 @@ docker image rm {id} -f # delete image with id, -f=force (w/out stoping it)
                         # also must run if changes to Dockerfile
                         # instead -fv to also remove related volumes
 
-# run 
+# run
 docker run -d --name node-app node-app-image # -d=detached mode
 docker ps # to view all running containers
 docker rm node-app -f # must remove before rebuild the image
-docker logs node-app 
+docker logs node-app
 ```
 
 ## Docker command to run above container
+
 ```bash
 docker run -p 3000:3000 -d --name node-app node-app-image
 # -p 3000:3000 = host machine entry port:container entry port
@@ -63,24 +64,28 @@ docker run -p 3000:3000 -v $(pwd):/app -d --name node-app node-app-image
 docker run -p 3000:3000 -v $(pwd):/app -v /app/node_modules -d --name node-app node-app-image
 
 ```
+
 ## Final docker command
--  (we will transport this to docker-compose)
+
+- (we will transport this to docker-compose)
 
 ```bash
-docker run 
-  -v $(pwd):/app:ro 
+docker run
+  -v $(pwd):/app:ro
   -v /app/node_modules
-  # --env PORT=3000 // you can override default PORT as stated in Dockerfile 
+  # --env PORT=3000 // you can override default PORT as stated in Dockerfile
   --env-file= ./.env # (or just use .env file)
-  -p 3000:3000 
-  -d 
-  --name node-app 
+  -p 3000:3000
+  -d
+  --name node-app
   node-app-image
 
 ```
 
-## How to log into container (eg. to view files) 
--  Make sure no unnecessary files (use dockerignore)
+## How to log into container (eg. to view files)
+
+- Make sure no unnecessary files (use dockerignore)
+
 ```bash
 docker exec -it node-app bash
 ls # view files
@@ -88,13 +93,16 @@ cat app.js # to view contents of file
 printenv # allows to print all env variables in container
 exit
 ```
+
 ## dockerignore
+
 - Dockerfile does build image so Dockerfile doesnt need to be in the container.
 - Also dont need to copy node_modules folder, we will move away from having a node_modules in our machine.
 - .dockerignore doesnt need to be on the container as well
 
 ## Development hot-reload
-- Use volumes (bind-mount) allows to sync folder in 
+
+- Use volumes (bind-mount) allows to sync folder in
   machine or file system to folder in docker dontainer
 
 - Bind mount in docker command:
@@ -103,18 +111,20 @@ exit
 docker exec -it backend-mongo-1 bash # where 'path-to-folder-in-local-machine' : 'path-to-folder-in-container'
 ```
 
-```
-- We need a anonimous-volume so we can unsync out local node_modules 
+````
+- We need a anonimous-volume so we can unsync out local node_modules
   (we want to be able to remove it from local but for it to stay on the container)
   Use another -v flag
 
 ```bash
 docker run -v $(pwd):/app -v /app/node_modules   ....rest of flags
-```
+````
+
 - this volume is more specific and allows to override the anterior bind-mount
-so node_modules wont be touch!
+  so node_modules wont be touch!
 
 ## Docker container should be read-only
+
 ```bash
 docker run -v $(pwd):/app:ro    # then rest of params
 
@@ -123,8 +133,9 @@ docker run -v $(pwd):/app:ro    # then rest of params
 ```
 
 ## env file
+
 - The flag -env can pass env variables to the container but you can as well
-write then out in an .env file. (pass the --env-file flag to docker command)
+  write then out in an .env file. (pass the --env-file flag to docker command)
 
 ```bash
 docker run  --env-file= ./.env (or just use .env file)   ....rest of flags
@@ -136,6 +147,7 @@ docker run  --env-file= ./.env (or just use .env file)   ....rest of flags
 docker exec -it backend-mongo-1 mongosh -u root -p mypassword
 
 ```
+
 ```bash
   test> db # shows all dbs
   test
@@ -165,16 +177,39 @@ docker exec -it backend-mongo-1 mongosh -u root -p mypassword
 
 ```bash
 docker ps # to get container name
-docker inspect backend-node-app-1 
+docker inspect backend-node-app-1
 ```
+
 - But instead of the commands above you can use the name of the service instead,
-docker already sets it up for you. So use `ip-address=name-of-mongo-service` when connecting to mongoose.
+  docker already sets it up for you. So use `ip-address=name-of-mongo-service` when connecting to mongoose.
 
 - To know if mongoose has connected correctly you can ping it
- - See (https://www.mongodb.com/docs/manual/reference/command/ping/)
+- See (https://www.mongodb.com/docs/manual/reference/command/ping/)
 
 ```bash
  docker exec -it backend-mongo-1 mongosh
 db.runCommand({ ping: 1 })
 { ok: 1 } # correct response
+```
+
+# About --revew-anon-volumes (-V) flag
+
+- When changes are done to the package.json you can:
+
+1. `docker compose down` and then `up --build` again or
+2. Just do `docker compose up --build -V` where `-V` is the revew-anon-volumes flag. Because node_modules is in an annon volume you need to make sure the new volume does get reniew, so it can contain contain the new libraries that you might have added changes to the dependencies.
+
+# Accessing Redis container
+
+```bash
+docker exec -it backend-redis-1 bash
+root@952577b3fe4a:/data# redis-cli
+# or you can `docker exec -it backend-redis-1 redis_cli` in one step
+127.0.0.1:6379> keys * # shows all keys stored
+(empty array) # Note that `maxAge: 60000 ` means this entry will be removed in 1 minute
+# `GET sessionId` gives you the given sessionId details
+127.0.0.1:6379> exit
+root@952577b3fe4a:/data# exit
+exit
+
 ```

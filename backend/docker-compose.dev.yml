@@ -5,7 +5,7 @@ services:
       context: .
       # this variables are used in Dockerfile so we need to
       #  pass then so these are available when builting image
-      args: 
+      args:
         NODE_ENV: development
     volumes:
       - ./:/app
@@ -14,6 +14,7 @@ services:
       - NODE_ENV=production
       - MONGO_USER=root
       - MONGO_PASSWORD=mypassword
+      - SESSION_SECRET=secret
     command: npm run dev
   mongo:
     environment:

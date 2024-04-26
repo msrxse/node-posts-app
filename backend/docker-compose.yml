@@ -18,5 +18,8 @@ services:
     volumes:
       # Allows us to persist data here 
       - mongo-db:/data/db
+  redis:
+    image: redis
+
 volumes:
   mongo-db:

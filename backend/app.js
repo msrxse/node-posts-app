@@ -1,12 +1,24 @@
 const express = require("express");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
+const session = require("express-session");
+const redis = require("redis");
+const RedisStore = require("connect-redis").default;
+
 const {
   MONGO_USER,
   MONGO_PASSWORD,
   MONGO_IP,
   MONO_PORT,
+  REDIS_URL,
+  REDIS_PORT,
+  SESSION_SECRET,
 } = require("./config/config");
+
+let redisClient = redis.createClient({
+  host: REDIS_URL,
+  port: REDIS_PORT,
+});
 
 const postRouter = require("./routes/postRoutes");
 const userRouter = require("./routes/userRoutes");
@@ -38,6 +50,27 @@ app.set("view engine", "ejs");
 // middleware and static files
 app.use(express.static("public"));
 app.use(morgan("dev"));
+
+// Initialize store.
+let redisStore = new RedisStore({
+  client: redisClient,
+});
+
+// cookie settings in express-session npm page
+app.use(
+  session({
+    store: redisStore,
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false,
+      httpOnly: true,
+      maxAge: 60000,
+    },
+  })
+);
+
 // body body to be included in requests
 app.use(express.json());
 
