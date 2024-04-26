@@ -3,7 +3,7 @@ const morgan = require("morgan");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const redis = require("redis");
-const RedisStore = require("connect-redis").default;
+let RedisStore = require("connect-redis")(session);
 
 const {
   MONGO_USER,
@@ -51,19 +51,14 @@ app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(morgan("dev"));
 
-// Initialize store.
-let redisStore = new RedisStore({
-  client: redisClient,
-});
-
 // cookie settings in express-session npm page
 app.use(
   session({
-    store: redisStore,
+    store: new RedisStore({ client: redisClient }),
     secret: SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
     cookie: {
+      resave: false,
+      saveUninitialized: false,
       secure: false,
       httpOnly: true,
       maxAge: 60000,

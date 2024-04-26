@@ -206,8 +206,15 @@ docker exec -it backend-redis-1 bash
 root@952577b3fe4a:/data# redis-cli
 # or you can `docker exec -it backend-redis-1 redis_cli` in one step
 127.0.0.1:6379> keys * # shows all keys stored
-(empty array) # Note that `maxAge: 60000 ` means this entry will be removed in 1 minute
+(empty array)
+127.0.0.1:6379> keys *
+# Note that `maxAge: 60000 ` means this entry will be removed in 1 minute
+1) "sess:JhKe2xIsm4Z_Bz-QXnxgUnUuMlsbMkmn" ≈
 # `GET sessionId` gives you the given sessionId details
+127.0.0.1:6379> get "sess:JhKe2xIsm4Z_Bz-QXnxgUnUuMlsbMkmn"
+"{\"cookie\":{\"originalMaxAge\":60000,\"expires\":\"2024-04-26T18:10:44.442Z\",\"secure\":false,\"httpOnly\":true,\"path\":\"/\"}}"
+127.0.0.1:6379>
+
 127.0.0.1:6379> exit
 root@952577b3fe4a:/data# exit
 exit
