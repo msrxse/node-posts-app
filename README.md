@@ -213,6 +213,7 @@ root@952577b3fe4a:/data# redis-cli
 # `GET sessionId` gives you the given sessionId details
 127.0.0.1:6379> get "sess:JhKe2xIsm4Z_Bz-QXnxgUnUuMlsbMkmn"
 "{\"cookie\":{\"originalMaxAge\":60000,\"expires\":\"2024-04-26T18:10:44.442Z\",\"secure\":false,\"httpOnly\":true,\"path\":\"/\"}}"
+# the object above is the session and we can add anything else to it - see authCOntroller (`req.session.user = user;`)
 127.0.0.1:6379>
 
 127.0.0.1:6379> exit

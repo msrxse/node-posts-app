@@ -10,6 +10,8 @@ exports.signUp = async (req, res) => {
       username,
       password: hashpassword,
     });
+    // we save user to the session so we can access it anytime
+    req.session.user = newUser;
     res.status(201).json({
       status: "success",
       data: {
@@ -38,6 +40,8 @@ exports.login = async (req, res) => {
     const isCorrect = await bcrypt.compare(password, user.password);
 
     if (isCorrect) {
+      // here we adding the user to the session data
+      req.session.user = user;
       res.status(201).json({
         status: "success",
       });
