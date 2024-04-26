@@ -1,6 +1,7 @@
      
 # Nodejs and Express example with MongoDB
 
+Blog/posts application demo CRUD with node backend
 
 ## Run the System
 ```bash
@@ -9,7 +10,7 @@ cd backend && docker compose -f docker-compose.yml -f docker-compose.dev.yml up 
 or without docker:
 
 ```bash
-cd backend && node app.js
+cd backend && npm install && npm run dev
 ```
 
 # Working with docker compose
