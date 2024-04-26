@@ -1,0 +1,22 @@
+{
+  // List of extensions which should be recommended for users of this workspace.
+  // To install all: Navigate to "Extensions", filter extensions using "Recommended" filter
+  "recommendations": [
+    "christian-kohler.npm-intellisense",
+    // "mattpocock.ts-error-translator",
+    // "stylelint.vscode-stylelint",
+    "ms-azuretools.vscode-docker",
+    "esbenp.prettier-vscode",
+    // new
+    "nur.just-black",
+    "vscode-icons-team.vscode-icons",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "quicktype.quicktype",
+    "vunguyentuan.vscode-postcss",
+    "streetsidesoftware.code-spell-checker",
+    "yoavbls.pretty-ts-errors",
+    "rangav.vscode-thunder-client",
+    "dsznajder.es7-react-js-snippets"
+  ]
+}
