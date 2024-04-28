@@ -1,11 +1,14 @@
-version: '3'
+version: '3.9'
 services:
+  nginx:
+    ports:
+      - "80:80"
   node-app:
     build:
       context: .
       # this variables are used in Dockerfile so we need to
       #  pass then so these are available when builting image
-      args: 
+      args:
         NODE_ENV: production
     environment:
       - NODE_ENV=production

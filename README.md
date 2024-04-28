@@ -221,3 +221,11 @@ root@952577b3fe4a:/data# exit
 exit
 
 ```
+
+# Scaling your application
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build --scale node-app=2
+```
+
+- For more on this see the readme file here: `backend/nginx/README.md`

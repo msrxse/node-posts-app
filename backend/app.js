@@ -51,6 +51,10 @@ app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(morgan("dev"));
 
+// Just trust what nginx does give you in their headers!
+// See http://expressjs.com/en/guide/behind-proxies.html
+app.enable("trust proxy");
+
 // cookie settings in express-session npm page
 app.use(
   session({
@@ -69,8 +73,9 @@ app.use(
 // body body to be included in requests
 app.use(express.json());
 
-app.get("/", (req, res) => {
+app.get("/api/v1", (req, res) => {
   res.send("<h2>Health check</h2>");
+  console.log("yeah it ran");
 });
 app.use("/api/v1/posts", postRouter);
 app.use("/api/v1/users", userRouter);
