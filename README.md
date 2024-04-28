@@ -229,3 +229,7 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build --s
 ```
 
 - For more on this see the readme file here: `backend/nginx/README.md`
+
+* About CORS
+
+- Allows your frontend to run on one domain an your backend on a diferent backend. By default API would reject requests from a different domain.

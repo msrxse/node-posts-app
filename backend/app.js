@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const redis = require("redis");
@@ -54,6 +55,8 @@ app.use(morgan("dev"));
 // Just trust what nginx does give you in their headers!
 // See http://expressjs.com/en/guide/behind-proxies.html
 app.enable("trust proxy");
+
+app.use(cors({}));
 
 // cookie settings in express-session npm page
 app.use(
