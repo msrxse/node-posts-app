@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const redis = require("redis");
 let RedisStore = require("connect-redis")(session);
-const postModel = require("./models/postModel");
+const siteRouter = require("./routes/siteRoutes");
 
 const {
   MONGO_USER,
@@ -84,72 +84,26 @@ app.get("/api/v1", (req, res) => {
   console.log("yeah it ran");
 });
 
-app.use("/api/v1/posts", postRouter);
-app.use("/api/v1/users", userRouter);
-
-// listen for requests
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`listening on port ${port}`));
-
-// this routes are for the node website
-// ideally this would be a React app using the above API endpoints instead
 app.get("/", (req, res) => {
   res.redirect("/posts");
 });
 
-app.get("/posts", (req, res) => {
-  postModel
-    .find()
-    .sort({ createdAt: -1 })
-    .then((result) => {
-      res.render("index", { title: "Home", blogs: result });
-    })
-    .catch((err) => console.log(err));
-});
+app.use("/api/v1/posts", postRouter);
+app.use("/api/v1/users", userRouter);
 
 app.get("/about", (req, res) => {
   res.render("about", { title: "About" });
 });
 
-app.get("/posts/create", (req, res) => {
-  res.render("create", { title: "Create a new blog" });
-});
-
-app.get("/posts/:id", (req, res) => {
-  const id = req.params.id;
-  postModel
-    .findById(id)
-    .then((result) => {
-      res.render("details", { title: "Blog Details", blog: result });
-    })
-    .catch((err) => console.log(err));
-});
-
-app.post("/posts", (req, res) => {
-  // express.urlencoded middleware allows req.body to have the form fields
-  const post = new postModel(req.body);
-
-  post
-    .save()
-    .then((result) => {
-      res.redirect("posts");
-    })
-    .catch((err) => console.log(err));
-});
-
-app.delete("/posts/:id", (req, res) => {
-  const id = req.params.id;
-  // we dont redirect here, instead
-  // we send json-data back to browser with a redirect property
-  postModel
-    .findByIdAndDelete(id)
-    .then((result) => {
-      res.json({ redirect: "/posts" });
-    })
-    .catch((err) => console.log(err));
-});
+// this next routes are for the node website
+// ideally this would be a React app using the above API endpoints instead
+app.use("/posts", siteRouter);
 
 // 404 page
 app.use((req, res) => {
   res.render("404", { title: "404" });
 });
+
+// listen for requests
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`listening on port ${port}`));
