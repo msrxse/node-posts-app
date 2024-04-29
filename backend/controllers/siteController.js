@@ -5,7 +5,7 @@ const post_index = (req, res) => {
     .find()
     .sort({ createdAt: -1 })
     .then((result) => {
-      res.render("index", { blogs: result, title: "All blogs" });
+      res.render("posts/index", { blogs: result, title: "All blogs" });
     })
     .catch((err) => {
       console.log(err);
@@ -17,7 +17,7 @@ const post_details = (req, res) => {
   postModel
     .findById(id)
     .then((result) => {
-      res.render("details", { blog: result, title: "Blog Details" });
+      res.render("posts/details", { blog: result, title: "Blog Details" });
     })
     .catch((err) => {
       console.log(err);
@@ -25,7 +25,7 @@ const post_details = (req, res) => {
 };
 
 const post_create_get = (req, res) => {
-  res.render("create", { title: "Create a new blog" });
+  res.render("posts/create", { title: "Create a new blog" });
 };
 
 const post_create_post = (req, res) => {
