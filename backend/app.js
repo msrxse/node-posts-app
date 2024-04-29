@@ -5,12 +5,13 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const redis = require("redis");
 let RedisStore = require("connect-redis")(session);
+const postModel = require("./models/postModel");
 
 const {
   MONGO_USER,
   MONGO_PASSWORD,
   MONGO_IP,
-  MONO_PORT,
+  MONGO_PORT,
   REDIS_URL,
   REDIS_PORT,
   SESSION_SECRET,
@@ -26,7 +27,7 @@ const userRouter = require("./routes/userRoutes");
 
 // express app
 const app = express();
-const mongoURL = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONO_PORT}/?authSource=admin`;
+const mongoURL = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONGO_PORT}/?authSource=admin`;
 // connect DB
 // ip-address = name-of-container (you can refer to the IP with the name of the container)
 
@@ -50,6 +51,8 @@ app.set("view engine", "ejs");
 
 // middleware and static files
 app.use(express.static("public"));
+// allows form body to be attached to req object
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
 // Just trust what nginx does give you in their headers!
@@ -68,7 +71,7 @@ app.use(
       saveUninitialized: false,
       secure: false,
       httpOnly: true,
-      maxAge: 60000, // just 1 min for testing purposes
+      maxAge: 3600000, // 1h. shorten for testing if needed
     },
   })
 );
@@ -80,40 +83,73 @@ app.get("/api/v1", (req, res) => {
   res.send("<h2>Health check</h2>");
   console.log("yeah it ran");
 });
+
 app.use("/api/v1/posts", postRouter);
 app.use("/api/v1/users", userRouter);
 
-const port = process.env.PORT || 3000;
 // listen for requests
+const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`listening on port ${port}`));
 
-// app.get("/", (req, res) => {
-//   const blogs = [
-//     {
-//       title: "Yoshi finds eggs!!!",
-//       snippet: "Lorem ipsum dolor sit amet consectetur",
-//     },
-//     {
-//       title: "Mario finds stars",
-//       snippet: "Lorem ipsum dolor sit amet consectetur",
-//     },
-//     {
-//       title: "How to defeat bowser",
-//       snippet: "Lorem ipsum dolor sit amet consectetur",
-//     },
-//   ];
-//   res.render("index", { title: "Home", blogs });
-// });
+// this routes are for the node website
+// ideally this would be a React app using the above API endpoints instead
+app.get("/", (req, res) => {
+  res.redirect("/posts");
+});
 
-// app.get("/about", (req, res) => {
-//   res.render("about", { title: "About" });
-// });
+app.get("/posts", (req, res) => {
+  postModel
+    .find()
+    .sort({ createdAt: -1 })
+    .then((result) => {
+      res.render("index", { title: "Home", blogs: result });
+    })
+    .catch((err) => console.log(err));
+});
 
-// app.get("/blogs/create", (req, res) => {
-//   res.render("create", { title: "Create a new blog" });
-// });
+app.get("/about", (req, res) => {
+  res.render("about", { title: "About" });
+});
 
-// // 404 page
-// app.use((req, res) => {
-//   res.render("404", { title: "404" });
-// });
+app.get("/posts/create", (req, res) => {
+  res.render("create", { title: "Create a new blog" });
+});
+
+app.get("/posts/:id", (req, res) => {
+  const id = req.params.id;
+  postModel
+    .findById(id)
+    .then((result) => {
+      res.render("details", { title: "Blog Details", blog: result });
+    })
+    .catch((err) => console.log(err));
+});
+
+app.post("/posts", (req, res) => {
+  // express.urlencoded middleware allows req.body to have the form fields
+  const post = new postModel(req.body);
+
+  post
+    .save()
+    .then((result) => {
+      res.redirect("posts");
+    })
+    .catch((err) => console.log(err));
+});
+
+app.delete("/posts/:id", (req, res) => {
+  const id = req.params.id;
+  // we dont redirect here, instead
+  // we send json-data back to browser with a redirect property
+  postModel
+    .findByIdAndDelete(id)
+    .then((result) => {
+      res.json({ redirect: "/posts" });
+    })
+    .catch((err) => console.log(err));
+});
+
+// 404 page
+app.use((req, res) => {
+  res.render("404", { title: "404" });
+});
