@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const redis = require("redis");
 let RedisStore = require("connect-redis")(session);
-const siteRouter = require("./routes/siteRoutes");
 
 const {
   MONGO_USER,
@@ -24,6 +23,7 @@ let redisClient = redis.createClient({
 
 const postRouter = require("./routes/postRoutes");
 const userRouter = require("./routes/userRoutes");
+const siteRouter = require("./routes/siteRoutes");
 
 // express app
 const app = express();
